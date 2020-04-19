@@ -1,36 +1,91 @@
-<p align="center"><a href="https://github.com/crazy-max/csgo-server-launcher" target="_blank"><img width="128" src="https://github.com/crazy-max/csgo-server-launcher/blob/master/.res/logo.png"></a></p>
-
-<p align="center">
-  <a href="https://github.com/crazy-max/csgo-server-launcher/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/csgo-server-launcher.svg?style=flat-square" alt="GitHub release"></a>
-  <a href="https://github.com/crazy-max/csgo-server-launcher/actions?workflow=build"><img src="https://github.com/crazy-max/csgo-server-launcher/workflows/build/badge.svg" alt="Build Status"></a>
-  <a href="https://hub.docker.com/r/crazymax/csgo-server-launcher/"><img src="https://img.shields.io/docker/stars/crazymax/csgo-server-launcher.svg?style=flat-square" alt="Docker Stars"></a>
-  <a href="https://hub.docker.com/r/crazymax/csgo-server-launcher/"><img src="https://img.shields.io/docker/pulls/crazymax/csgo-server-launcher.svg?style=flat-square" alt="Docker Pulls"></a>
-  <a href="https://www.codacy.com/app/crazy-max/csgo-server-launcher"><img src="https://img.shields.io/codacy/grade/41e240a938654db0a667c6614e8ae9d5.svg?style=flat-square" alt="Code Quality"></a>
-  <br /><a href="https://github.com/sponsors/crazy-max"><img src="https://img.shields.io/badge/sponsor-crazy--max-181717.svg?logo=github&style=flat-square" alt="Become a sponsor"></a>
-  <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square" alt="Donate Paypal"></a>
-</p>
-
 ## About
+CS:GO Dedicated server dockerized
 
-A simple bash script to create and launch your Counter-Strike : Global Offensive Dedicated Server.<br />
-A Docker image 🐳 is also [available](docker).<br />
-Tested on Debian based distros (Ubuntu, Mint, ...)
+## Environment variables
 
-## Documentation
+* `TZ` : The timezone assigned to the container (default `UTC`)
+* `PUID` : csgo-server-launcher user id (default `1000`)
+* `PGID` : csgo-server-launcher group id (default `1000`)
 
-* [Requirements](doc/requirements.md)
-* [Installation](doc/installation.md)
-* [Configuration](doc/configuration.md)
-* [Usage](doc/usage.md)
-* [Auto Update](doc/auto-update.md)
-* [FAQ](doc/faq.md)
+And also the following environment variables to edit the .env file
 
-## How can I help ?
+* `IP` (default `$(sudo dig -4 +short myip.opendns.com @resolver1.opendns.com)`)
+* `PORT` (default `27015`)
+* `GSLT`
+* `STEAM_LOGIN` (default `anonymous`)
+* `STEAM_PASSWORD` (default `anonymous`)
+* `CLEAR_DOWNLOAD_CACHE` (default `0`)
+* `API_AUTHORIZATION_KEY`
+* `WORKSHOP_COLLECTION_ID` (default `125499818`)
+* `WORKSHOP_START_MAP` (default `125488374`)
+* `MAXPLAYERS` (default `18`)
+* `TICKRATE` (default `64`)
+* `EXTRAPARAMS` (default `-nohltv +game_type 0 +game_mode 1 +mapgroup mg_active +map de_inferno +sv_lan 0`)
 
-All kinds of contributions are welcome :raised_hands:! The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon: You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) :clap: or by making a [Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely! :rocket:
+## Volumes
 
-Thanks again for your support, it is much appreciated! :pray:
+* `/var/steamcmd/games/csgo` : CSGO root folder
+* `/home/steam/Steam` : Steam folder for logs, appcache, etc...
 
-## License
+## Usage
 
-LGPL. See `LICENSE` for more details.
+### Docker Compose
+
+Docker compose is the recommended way to run this image. Edit the compose and env files with your preferences and run the following command :
+
+```bash
+$ docker-compose up -d
+$ docker-compose logs -f
+```
+
+### Command line
+
+You can also use the following minimal command :
+
+```bash
+$ docker run -dt --name csgo --restart always \
+  --ulimit nproc=65535 \
+  --ulimit nofile=32000:40000 \
+  -p ${PORT}:${PORT} \
+  -p ${PORT}:${PORT}/udp \
+  --env-file $(pwd)/.env \
+  -v $(pwd)/csgo:/var/steamcmd/games/csgo \
+  -v $(pwd)/steam:/home/steam/Steam \
+  crazymax/csgo-server-launcher:latest
+```
+
+> :warning: `${PORT}` is the CSGO server port defined in your `.env` file
+
+## Upgrade image
+
+You can upgrade this image whenever I push an update :
+
+```bash
+docker-compose pull
+docker-compose up -d
+```
+
+## Notes
+
+### Update CSGO
+
+If you use compose, you can update CSGO by using the updater.yml :
+
+```bash
+$ docker-compose down              # stop csgo
+$ docker-compose -f updater.yml up # start updater
+$ docker-compose up -d             # start csgo
+```
+
+If you don't use compose :
+
+```bash
+$ docker stop csgo
+$ docker run -it --name csgo-updater --restart on-failure \
+  --env-file $(pwd)/.env \
+  -v $(pwd)/csgo:/var/steamcmd/games/csgo \
+  -v $(pwd)/steam:/home/steam/Steam \
+  crazymax/csgo-server-launcher:latest \
+  csgo-server-launcher update
+$ docker start csgo
+```
