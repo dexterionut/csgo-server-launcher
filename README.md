@@ -34,7 +34,7 @@ And also the following environment variables to edit the .env file
 Docker compose is the recommended way to run this image. Edit the compose and env files with your preferences and run the following command :
 
 ```bash
-$ docker-compose up -d
+$ docker-compose --compatibility up -d
 $ docker-compose logs -f
 ```
 
@@ -44,7 +44,7 @@ You can upgrade this image whenever I push an update :
 
 ```bash
 docker-compose pull
-docker-compose up -d
+docker-compose --compatibility up -d
 ```
 
 ## Notes

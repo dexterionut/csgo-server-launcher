@@ -20,3 +20,8 @@ services:
         soft: 32000
         hard: 40000
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 800M
