@@ -1,5 +1,5 @@
 ## About
-CS:GO Dedicated server dockerized
+Dockerizeed CS:GO Dedicated Server
 
 ## Environment variables
 
