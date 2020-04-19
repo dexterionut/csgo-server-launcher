@@ -38,24 +38,6 @@ $ docker-compose up -d
 $ docker-compose logs -f
 ```
 
-### Command line
-
-You can also use the following minimal command :
-
-```bash
-$ docker run -dt --name csgo --restart always \
-  --ulimit nproc=65535 \
-  --ulimit nofile=32000:40000 \
-  -p ${PORT}:${PORT} \
-  -p ${PORT}:${PORT}/udp \
-  --env-file $(pwd)/.env \
-  -v $(pwd)/csgo:/var/steamcmd/games/csgo \
-  -v $(pwd)/steam:/home/steam/Steam \
-  crazymax/csgo-server-launcher:latest
-```
-
-> :warning: `${PORT}` is the CSGO server port defined in your `.env` file
-
 ## Upgrade image
 
 You can upgrade this image whenever I push an update :
@@ -75,17 +57,4 @@ If you use compose, you can update CSGO by using the updater.yml :
 $ docker-compose down              # stop csgo
 $ docker-compose -f updater.yml up # start updater
 $ docker-compose up -d             # start csgo
-```
-
-If you don't use compose :
-
-```bash
-$ docker stop csgo
-$ docker run -it --name csgo-updater --restart on-failure \
-  --env-file $(pwd)/.env \
-  -v $(pwd)/csgo:/var/steamcmd/games/csgo \
-  -v $(pwd)/steam:/home/steam/Steam \
-  crazymax/csgo-server-launcher:latest \
-  csgo-server-launcher update
-$ docker start csgo
 ```
