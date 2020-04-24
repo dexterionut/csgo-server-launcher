@@ -10,8 +10,8 @@ services:
     env_file:
       - '.env'
     volumes:
+      - './config:/var/steamcmd/games/csgo/csgo/cfg'
       - '${CSGO_PATH}:/var/steamcmd/games/csgo'
       - '${STEAM_PATH}:/home/steam/Steam'
-      - './config:/var/steamcmd/games/csgo/csgo/cfg'
     tty: true
     restart: on-failure
