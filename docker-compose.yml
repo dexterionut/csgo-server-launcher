@@ -10,8 +10,8 @@ services:
     env_file:
       - '.env'
     volumes:
-      - './.docker/csgo:/var/steamcmd/games/csgo'
-      - './.docker/steam:/home/steam/Steam'
+      - '${CSGO_PATH}:/var/steamcmd/games/csgo'
+      - '${STEAM_PATH}:/home/steam/Steam'
       - './config:/var/steamcmd/games/csgo/csgo/cfg'
     tty: true
     ulimits:
@@ -23,5 +23,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 800M
+          cpus: '${MAX_CPUS}'
+          memory: ${MAX_RAM}
